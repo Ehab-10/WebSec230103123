@@ -74,89 +74,104 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $authUser = auth()->user();
-
-        // الأدمين له كامل الصلاحيات
+    
+        // ✅ Admin can edit anyone
         if ($authUser->hasRole('admin')) {
             return view('users.edit', compact('user'));
         }
-
-        // الموظف يقدر يعدل معلومات عامة فقط (مثلاً: الاسم والبريد)
+    
+        // ✅ Employee can edit anyone EXCEPT admins
         if ($authUser->hasRole('employee')) {
-            return view('users.edit', compact('user'));
+            if ($user->hasRole('admin')) {
+                abort(403, 'You cannot edit admins.');
+            }
+    
+            return view('users.edit', compact('user')); // same view, but limited in blade maybe
         }
-
-        // المستخدم العادي يقدر يعدل ملفه فقط
+    
+        // ✅ Regular user can edit only their own profile
         if ($authUser->id === $user->id) {
             return view('users.edit_self', compact('user'));
         }
-
+    
+        // ❌ Everyone else denied
         abort(403);
     }
+    
 
     public function update(Request $request, User $user)
-    {
-        $authUser = auth()->user();
+{
+    $authUser = auth()->user();
 
-        if ($authUser->hasRole('admin')) {
-            $data = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email,' . $user->id,
-                'password' => 'nullable|confirmed|min:8',
-                'admin' => 'nullable|boolean'
-            ]);
+    // إذا كان المستخدم Admin
+    if ($authUser->hasRole('admin')) {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|confirmed|min:8',
+            'role' => 'nullable|string|in:admin,employee,user'
+        ]);
 
-            $user->name = $data['name'];
-            $user->email = $data['email'];
+        $user->name = $data['name'];
+        $user->email = $data['email'];
 
-            if (!empty($data['password'])) {
-                $user->password = Hash::make($data['password']);
-            }
-
-            if (isset($data['admin']) && $data['admin']) {
-                $user->syncRoles('admin');
-            } else {
-                $user->syncRoles('employee');
-            }
-
-            $user->save();
-
-            return redirect()->route('users.index')->with('success', 'User updated.');
+        if (!empty($data['password'])) {
+            $user->password = Hash::make($data['password']);
         }
 
-        if ($authUser->hasRole('employee')) {
-            $data = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email,' . $user->id,
-            ]);
-
-            $user->name = $data['name'];
-            $user->email = $data['email'];
-            $user->save();
-
-            return redirect()->route('users.index')->with('success', 'User updated by Employee.');
-        }
-
-        if ($authUser->id === $user->id) {
-            $data = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email,' . $user->id,
-                'password' => 'nullable|confirmed|min:8',
-            ]);
-
-            $user->name = $data['name'];
-            $user->email = $data['email'];
-
-            if (!empty($data['password'])) {
-                $user->password = Hash::make($data['password']);
+        // إذا يملك صلاحية تعديل المستخدمين
+        if ($authUser->can('edit_users')) {
+            if ($request->filled('role')) {
+                $role = $request->input('role');
+                if (in_array($role, ['admin', 'employee', 'user'])) {
+                    $user->syncRoles([$role]);
+                }
             }
-
-            $user->save();
-
-            return redirect()->route('profile.edit')->with('success', 'Profile updated.');
+            // إذا لم يُرسل حقل 'role'، لا نغير الدور
         }
 
-        abort(403);
+        $user->save();
+
+        return redirect()->route('users.index')->with('success', 'User updated.');
     }
+
+    // إذا كان الموظف Employee
+    if ($authUser->hasRole('employee')) {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->save();
+
+        return redirect()->route('users.index')->with('success', 'User updated by Employee.');
+    }
+
+    // إذا كان المستخدم يعدّل ملفه الشخصي فقط
+    if ($authUser->id === $user->id) {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|confirmed|min:8',
+        ]);
+
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+
+        if (!empty($data['password'])) {
+            $user->password = Hash::make($data['password']);
+        }
+
+        $user->save();
+
+        return redirect()->route('profile.edit')->with('success', 'Profile updated.');
+    }
+
+    abort(403);
+}
+
 
     public function destroy(User $user)
     {

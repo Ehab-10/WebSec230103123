@@ -10,61 +10,34 @@ use Illuminate\Support\Facades\Hash;
 
 class RolePermissionSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        // مسح الكاش الخاص بالصلاحيات
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-
-        // انشاء الصلاحيات
-        $permissions = [
-            'view_users',
-            'create_users',
-            'edit_users',
-            'delete_users',
-        ];
-
-        foreach ($permissions as $perm) {
-            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+        function createPermissionIfNotExists($name) {
+            if (!Permission::where('name', $name)->exists()) {
+                Permission::create(['name' => $name]);
+            }
         }
 
-        // انشاء الأدوار
-        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'web']);
- 
+        // الصلاحيات الجديدة
+        createPermissionIfNotExists('buy products');
+        createPermissionIfNotExists('view own profile');
+        createPermissionIfNotExists('list purchased products');
+        createPermissionIfNotExists('add products');
+        createPermissionIfNotExists('edit products');
+        createPermissionIfNotExists('delete products');
+        createPermissionIfNotExists('list customers');
+        createPermissionIfNotExists('add credit');
 
-        // في تهيئة الأدوار والصلاحيات
-        $roleEmployee = Role::findByName('employee');
-        $roleEmployee->givePermissionTo('edit_users');
- 
-        // ربط الصلاحيات بالدور الادمن (كل الصلاحيات)
-        $adminRole->syncPermissions(Permission::all());
+        // التأكد أن الأدوار موجودة
+        $roleUser = Role::firstOrCreate(['name' => 'user']);
+        $roleEmployee = Role::firstOrCreate(['name' => 'employee']);
+        $roleAdmin = Role::firstOrCreate(['name' => 'admin']);
 
-        // ربط صلاحية عرض فقط للموظف
-        $employeeRole->syncPermissions(['view_users', 'edit_users']);
-
-
-        // انشاء مستخدم ادمن
-        $adminUser = User::firstOrCreate(
-            ['email' => 'admin@example.com'], 
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make('password123'),
-            ]
-        );
-
-        // ربط المستخدم بدور الادمن
-        $adminUser->assignRole($adminRole);
-
-        // انشاء مستخدم موظف
-        $employeeUser = User::firstOrCreate(
-            ['email' => 'employee@example.com'],
-            [
-                'name' => 'Employee User',
-                'password' => Hash::make('password123'),
-            ]
-        );
-
-        // ربط المستخدم بدور الموظف
-        $employeeUser->assignRole($employeeRole);
+        // إضافة الصلاحيات بدون حذف القديمة
+        $roleUser->givePermissionTo(['buy products', 'view own profile', 'list purchased products']);
+        $roleEmployee->givePermissionTo(['add products', 'edit products', 'delete products', 'list customers', 'add credit']);
+        $roleAdmin->givePermissionTo(Permission::all());
     }
 }
+
+

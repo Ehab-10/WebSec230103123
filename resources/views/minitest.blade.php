@@ -2,6 +2,17 @@
 @section('title', 'MiniTest - Supermarket Bill')
 
 @section('content')
+
+@php
+  // Sample supermarket bill data
+  $bill = [
+      ['item' => 'Milk',   'price' => 2.5, 'qty' => 2],
+      ['item' => 'Bread',  'price' => 1.8, 'qty' => 1],
+      ['item' => 'Apple',  'price' => 0.5, 'qty' => 6],
+  ];
+  $grandTotal = 0;
+@endphp
+
 <div class="card shadow-lg border-0">
   <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
     <h5 class="mb-0">🧾 Supermarket Bill</h5>
@@ -24,7 +35,6 @@
         </tr>
       </thead>
       <tbody>
-        @php $grandTotal = 0; @endphp
         @foreach($bill as $item)
           @php
             $total = $item['price'] * $item['qty'];
@@ -49,4 +59,5 @@
     <p class="mt-4 text-muted">Thank you for shopping with us! 😊</p>
   </div>
 </div>
+
 @endsection

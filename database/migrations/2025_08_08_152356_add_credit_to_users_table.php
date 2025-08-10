@@ -10,18 +10,13 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->decimal('credit', 8, 2)->default(0);
-            $table->string('role')->default('customer'); 
         });
     }
     
-public function down()
-{
-    if (Schema::hasColumn('users', 'credit')) {
+    public function down()
+    {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('credit');
         });
     }
-}
-
-    
 };

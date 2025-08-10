@@ -44,11 +44,18 @@
 
         <!-- ✅ Admin Checkbox -->
         @if(auth()->user()->hasRole('admin')) 
-  <div class="form-check mb-3">
-      <input type="checkbox" name="admin" value="1" class="form-check-input" id="adminCheck"
-             {{ old('admin', $user->hasRole('admin')) ? 'checked' : '' }}>
-      <label class="form-check-label" for="adminCheck">Is Admin?</label>
+        @can('edit_users')
+  <div class="mb-3">
+    <label for="role">Role</label>
+    <select name="role" id="role" class="form-select">
+      <option value="">-- Keep current role --</option>
+      <option value="admin" {{ $user->hasRole('admin') ? 'selected' : '' }}>Admin</option>
+      <option value="employee" {{ $user->hasRole('employee') ? 'selected' : '' }}>Employee</option>
+      <option value="user" {{ $user->hasRole('user') ? 'selected' : '' }}>User</option>
+    </select>
   </div>
+@endcan
+
 @endif  
 
 

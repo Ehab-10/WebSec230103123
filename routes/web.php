@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
@@ -72,9 +72,16 @@ Route::middleware(['auth', 'permission:edit_users'])->group(function () {
 // ----------------- صفحات عامة (بدون تسجيل دخول) -----------------
 Route::view('/even', 'even')->name('even');
 Route::view('/prime', 'prime')->name('prime');
-Route::view('/multable', 'multable')->name('multable');
+
+
+Route::get('/multable', function (Request $request) {
+    $j = $request->input('number'); // Get number from the form
+    return view('multable', compact('j'));
+});
+
 Route::view('/calculator', 'calculator')->name('calculator');
 Route::view('/minitest', 'minitest')->name('minitest');
+
 
 // ----------------- تسجيل حساب جديد -----------------
 Route::get('/register', [RegisteredUserController::class, 'create'])->middleware('guest')->name('register');
@@ -88,7 +95,8 @@ Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])-
 Route::post('/reset-password', [NewPasswordController::class, 'store'])->middleware('guest')->name('password.update');
 
 // ----------------- تسجيل الدخول عبر الشبكات الاجتماعية -----------------
-Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
+// تسجيل الدخول باستخدام Google
+Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 
 Route::get('/login/facebook', [FacebookController::class, 'redirectToFacebook']);

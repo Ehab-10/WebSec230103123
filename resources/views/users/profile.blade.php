@@ -29,8 +29,17 @@
             <label>Confirm Password:</label>
             <input type="password" name="password_confirmation" class="form-control">
         </div>
+        @if(auth()->user()->role === 'user')
+    <div class="alert alert-success d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-wallet me-2 fs-4"></i>
+            <span class="fw-medium">Your Credit:</span>
+        </div>
+        <span class="badge bg-dark fs-5 px-3 py-2">${{ number_format(auth()->user()->credit, 2) }}</span>
+    </div>
+@endif
 
-        <button class="btn btn-primary">Update Profile</button>
+        <button class="btn btn-primary w-100">Update Profile</button>
     </form>
 </div>
 @endsection

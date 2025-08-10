@@ -1,7 +1,7 @@
 <x-guest-layout>
-    <div class="text-center mb-3">
-        <h3 class="welcome-text mb-1">Welcome Back</h3>
-        <p class="welcome-subtitle mb-0">Please sign in to your account</p>
+    <div class="text-center mb-4">
+        <h3 class="welcome-text mb-1" style="font-size: 1.5rem; font-weight: 600;">Welcome Back</h3>
+        <p class="text-muted small mb-0">Please sign in to your account</p>
     </div>
 
     <!-- Session Status -->
@@ -18,7 +18,7 @@
 
         <!-- Email Address -->
         <div class="mb-3">
-            <label for="email" class="form-label small fw-medium">
+            <label for="email" class="form-label small fw-medium mb-1">
                 <i class="fas fa-envelope me-1"></i>{{ __('Email') }}
             </label>
             <input id="email" type="email" class="form-control form-control-sm @error('email') is-invalid @enderror" 
@@ -33,7 +33,7 @@
 
         <!-- Password -->
         <div class="mb-3">
-            <label for="password" class="form-label small fw-medium">
+            <label for="password" class="form-label small fw-medium mb-1">
                 <i class="fas fa-lock me-1"></i>{{ __('Password') }}
             </label>
             <div class="input-group input-group-sm">
@@ -52,29 +52,28 @@
         </div>
 
         <!-- Remember Me -->
-        <div class="mb-3 form-check">
-            <input class="form-check-input" type="checkbox" id="remember_me" name="remember">
-            <label class="form-check-label small" for="remember_me">
-                {{ __('Remember me') }}
-            </label>
-        </div>
-
-        <div class="d-grid mb-3">
-            <button type="submit" class="btn btn-primary fw-semibold py-2">
-                <i class="fas fa-sign-in-alt me-2"></i>{{ __('Log in') }}
-            </button>
-        </div>
-
-        <div class="text-center mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="remember_me" name="remember">
+                <label class="form-check-label small" for="remember_me">
+                    {{ __('Remember me') }}
+                </label>
+            </div>
             @if (Route::has('password.request'))
-                <a class="text-decoration-none small" href="{{ route('password.request') }}">
-                    <i class="fas fa-key me-1"></i>{{ __('Forgot your password?') }}
+                <a class="text-decoration-none small text-muted" href="{{ route('password.request') }}">
+                    {{ __('Forgot password?') }}
                 </a>
             @endif
         </div>
 
+        <div class="d-grid mb-4">
+            <button type="submit" class="btn btn-dark fw-semibold py-2">
+                <i class="fas fa-sign-in-alt me-2"></i>{{ __('Log in') }}
+            </button>
+        </div>
+
         <!-- Divider -->
-        <div class="position-relative text-center my-3">
+        <div class="position-relative text-center my-4">
             <hr class="text-muted">
             <span class="position-absolute top-50 start-50 translate-middle bg-dark px-2 small text-muted">
                 or continue with
@@ -82,29 +81,29 @@
         </div>
 
         <!-- Social Login Buttons -->
-        <div class="d-grid gap-2 mb-3">
-            <a href="{{ url('/login/google') }}" class="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center">
-                <i class="fab fa-google me-2"></i>Continue with Google
+        <div class="d-grid gap-2 mb-4">
+            <a href="{{ route('google.login') }}" class="btn btn-outline-light btn-sm d-flex align-items-center justify-content-center py-2">
+                <i class="fab fa-google me-2"></i>Google
+            </a>
+
+            <a href="{{ url('/login/facebook') }}" class="btn btn-outline-light btn-sm d-flex align-items-center justify-content-center py-2">
+                <i class="fab fa-facebook-f me-2"></i>Facebook
             </a>
             
-            <a href="{{ url('/login/facebook') }}" class="btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center">
-                <i class="fab fa-facebook-f me-2"></i>Continue with Facebook
+            <a href="{{ url('/login/microsoft') }}" class="btn btn-outline-light btn-sm d-flex align-items-center justify-content-center py-2">
+                <i class="fab fa-microsoft me-2"></i>Microsoft
             </a>
             
-            <a href="{{ url('/login/microsoft') }}" class="btn btn-outline-dark btn-sm d-flex align-items-center justify-content-center">
-                <i class="fab fa-microsoft me-2"></i>Continue with Microsoft
-            </a>
-            
-            <a href="{{ url('/login/linkedin') }}" class="btn btn-outline-info btn-sm d-flex align-items-center justify-content-center">
-                <i class="fab fa-linkedin-in me-2"></i>Continue with LinkedIn
+            <a href="{{ url('/login/linkedin') }}" class="btn btn-outline-light btn-sm d-flex align-items-center justify-content-center py-2">
+                <i class="fab fa-linkedin-in me-2"></i>LinkedIn
             </a>
         </div>
 
         <!-- Register Link -->
-        <div class="text-center">
+        <div class="text-center mt-4 pt-2 border-top">
             <p class="mb-0 small text-muted">
                 Don't have an account? 
-                <a href="{{ route('register') }}" class="text-decoration-none fw-semibold">
+                <a href="{{ route('register') }}" class="text-decoration-none fw-semibold text-dark">
                     Create one here
                 </a>
             </p>
