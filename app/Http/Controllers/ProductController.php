@@ -55,18 +55,30 @@ public function show($id)
 }
 
     // Store a newly created product
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-        ]);
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'code' => 'required|string|max:255|unique:products,code',
+        'name' => 'required|string|max:255',
+        'model' => 'nullable|string|max:255',
+        'price' => 'required|numeric',
+        'photo' => 'nullable|image|max:2048', // حجم الصورة 2MB كحد أقصى
+        'description' => 'nullable|string',
+    ]);
 
-        Product::create($request->only(['name', 'description', 'price']));
-
-        return redirect()->route('products.index')->with('success', 'Product created successfully.');
+    // معالجة رفع الصورة إذا تم تحميلها
+    if ($request->hasFile('photo')) {
+        $file = $request->file('photo');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads/products'), $filename);
+        $validated['photo'] = 'uploads/products/' . $filename;
     }
+
+    Product::create($validated);
+
+    return redirect()->route('products.index')->with('success', 'Product created successfully.');
+}
+
 
     // Show form to edit an existing product
     public function edit(Product $product)

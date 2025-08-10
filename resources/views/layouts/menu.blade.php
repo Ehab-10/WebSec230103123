@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="/">WebSec</a>
 
@@ -8,27 +8,31 @@
 
     <div class="collapse navbar-collapse show" id="navbarMenu">
       <!-- Public Links -->
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="/even">Even</a></li>
-        <li class="nav-item"><a class="nav-link" href="/prime">Prime</a></li>
-        <li class="nav-item"><a class="nav-link" href="/multable">Multiplication</a></li>
-        <li class="nav-item"><a class="nav-link" href="/minitest">Mini Test</a></li>
-        <li class="nav-item"><a class="nav-link" href="/calculator">Calculator</a></li>
+  <ul class="navbar-nav me-auto">
+  <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+  <li class="nav-item"><a class="nav-link" href="/even">Even</a></li>
+  <li class="nav-item"><a class="nav-link" href="/prime">Prime</a></li>
+  <li class="nav-item"><a class="nav-link" href="/multable">Multiplication</a></li>
+  <li class="nav-item"><a class="nav-link" href="/minitest">Mini Test</a></li>
+  <li class="nav-item"><a class="nav-link" href="/calculator">Calculator</a></li>
 
-        @auth
-          @if (auth()->user()->admin)
-            <li class="nav-item"><a class="nav-link" href="{{ route('roles.index') }}">Roles</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('permissions.index') }}">Permissions</a></li>
-            <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}"> Users</a></li>
-          @endif
+  @auth
+    @role('admin')
+      <li class="nav-item"><a class="nav-link" href="{{ route('roles.index') }}">Roles</a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ route('permissions.index') }}">Permissions</a></li>
+    @endrole
 
-          <li class="nav-item"><a class="nav-link" href="/products">Products</a></li>
-          <li class="nav-item"><a class="nav-link" href="/gpa">GPA Simulator</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ route('grades.index') }}">Grades</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ route('questions.index') }}">Questions</a></li>
-        @endauth
-      </ul>
+    @role('admin|employee')
+      <li class="nav-item"><a class="nav-link" href="{{ route('users.index') }}">Users</a></li>
+    @endrole
+
+    <li class="nav-item"><a class="nav-link" href="/products">Products</a></li>
+    <li class="nav-item"><a class="nav-link" href="/gpa">GPA Simulator</a></li>
+    <li class="nav-item"><a class="nav-link" href="{{ route('grades.index') }}">Grades</a></li>
+    <li class="nav-item"><a class="nav-link" href="{{ route('questions.index') }}">Questions</a></li>
+  @endauth
+</ul>
+
 
       <!-- Right Side: Login/Profile -->
       <ul class="navbar-nav ms-auto">

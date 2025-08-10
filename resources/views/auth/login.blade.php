@@ -1,94 +1,137 @@
 <x-guest-layout>
+    <div class="text-center mb-3">
+        <h3 class="welcome-text mb-1">Welcome Back</h3>
+        <p class="welcome-subtitle mb-0">Please sign in to your account</p>
+    </div>
+
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    @if (session('status'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ session('status') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
         <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="mb-3">
+            <label for="email" class="form-label small fw-medium">
+                <i class="fas fa-envelope me-1"></i>{{ __('Email') }}
+            </label>
+            <input id="email" type="email" class="form-control form-control-sm @error('email') is-invalid @enderror" 
+                   name="email" value="{{ old('email') }}" required autofocus autocomplete="username" 
+                   placeholder="Enter your email address">
+            @error('email')
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
+            @enderror
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div class="mb-3">
+            <label for="password" class="form-label small fw-medium">
+                <i class="fas fa-lock me-1"></i>{{ __('Password') }}
+            </label>
+            <div class="input-group input-group-sm">
+                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" 
+                       name="password" required autocomplete="current-password" 
+                       placeholder="Enter your password">
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                    <i class="fas fa-eye" id="toggleIcon"></i>
+                </button>
+            </div>
+            @error('password')
+                <div class="invalid-feedback d-block">
+                    {{ $message }}
+                </div>
+            @enderror
         </div>
 
         <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
+        <div class="mb-3 form-check">
+            <input class="form-check-input" type="checkbox" id="remember_me" name="remember">
+            <label class="form-check-label small" for="remember_me">
+                {{ __('Remember me') }}
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
+        <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-primary fw-semibold py-2">
+                <i class="fas fa-sign-in-alt me-2"></i>{{ __('Log in') }}
+            </button>
+        </div>
+
+        <div class="text-center mb-3">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
+                <a class="text-decoration-none small" href="{{ route('password.request') }}">
+                    <i class="fas fa-key me-1"></i>{{ __('Forgot your password?') }}
                 </a>
             @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
         </div>
 
-       <div class="mt-4 text-center">
-    <span class="text-sm text-gray-500">Don't have an account?</span>
-    <a href="{{ route('register') }}" class="text-sm text-blue-500 hover:underline">
-        Register here
-    </a>
-
-    @if (session('status'))
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ session('status') }}
+        <!-- Divider -->
+        <div class="position-relative text-center my-3">
+            <hr class="text-muted">
+            <span class="position-absolute top-50 start-50 translate-middle bg-dark px-2 small text-muted">
+                or continue with
+            </span>
         </div>
-    @endif
 
-    <div class="mt-6 flex flex-col gap-3">
-        <a href="{{ url('/login/facebook') }}"
-           class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md shadow-sm transition duration-150">
-            <svg class="w-5 h-5 mr-2 fill-current" viewBox="0 0 24 24"><path d="M22,12A10,10 0 1,0 12,22A10,10 0 0,0 22,12M15.5,12H13V18H10V12H8.5V9.5H10V8.25C10,6.76 10.9,5 13,5H15.5V7.5H14C13.17,7.5 13,7.88 13,8.5V9.5H15.5V12Z" /></svg>
-            Login with Facebook
-        </a>
+        <!-- Social Login Buttons -->
+        <div class="d-grid gap-2 mb-3">
+            <a href="{{ url('/login/google') }}" class="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center">
+                <i class="fab fa-google me-2"></i>Continue with Google
+            </a>
+            
+            <a href="{{ url('/login/facebook') }}" class="btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center">
+                <i class="fab fa-facebook-f me-2"></i>Continue with Facebook
+            </a>
+            
+            <a href="{{ url('/login/microsoft') }}" class="btn btn-outline-dark btn-sm d-flex align-items-center justify-content-center">
+                <i class="fab fa-microsoft me-2"></i>Continue with Microsoft
+            </a>
+            
+            <a href="{{ url('/login/linkedin') }}" class="btn btn-outline-info btn-sm d-flex align-items-center justify-content-center">
+                <i class="fab fa-linkedin-in me-2"></i>Continue with LinkedIn
+            </a>
+        </div>
 
-        <a href="{{ url('/login/microsoft') }}"
-           class="inline-flex items-center justify-center px-4 py-2 bg-gray-800 hover:bg-gray-900 text-white text-sm font-medium rounded-md shadow-sm transition duration-150">
-            <svg class="w-5 h-5 mr-2 fill-current" viewBox="0 0 24 24"><path d="M3 3h8v8H3V3m10 0h8v8h-8V3m0 10h8v8h-8v-8m-10 0h8v8H3v-8z" /></svg>
-            Login with Microsoft
-        </a>
-
-        <a href="{{ url('/login/linkedin') }}"
-           class="inline-flex items-center justify-center px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium rounded-md shadow-sm transition duration-150">
-            <svg class="w-5 h-5 mr-2 fill-current" viewBox="0 0 24 24"><path d="M19 3A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3H19M8.34 17.34V10.67H5.67V17.34H8.34M7 9.33A1.33 1.33 0 1 0 7 6.67A1.33 1.33 0 0 0 7 9.33M18.33 17.34V13.5C18.33 11.67 17 10.5 15.34 10.5C14.26 10.5 13.5 11.17 13.17 11.72V10.67H10.5V17.34H13.17V13.78C13.17 13 13.84 12.5 14.5 12.5C15.17 12.5 15.67 13 15.67 13.78V17.34H18.33Z" /></svg>
-            Login with LinkedIn
-        </a>
-
-        <a href="{{ url('/login/google') }}"
-           class="inline-flex items-center justify-center px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium rounded-md shadow-sm transition duration-150">
-    <svg class="w-5 h-5 mr-2" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg">
-        <path fill="#fff" d="M533.5 278.4c0-17.4-1.6-34.1-4.6-50.3H272v95.2h146.7c-6.3 34-25.1 62.7-53.5 81.7v67h86.2c50.5-46.5 82.1-115.1 82.1-193.6z"/>
-        <path fill="#fff" d="M272 544.3c71.6 0 131.7-23.7 175.6-64.3l-86.2-67c-24.3 16.3-55.5 25.8-89.4 25.8-68.9 0-127.3-46.5-148.2-109.1H36.3v68.7c43.8 86.5 134.7 145.9 235.7 145.9z"/>
-        <path fill="#fff" d="M123.8 329.7c-10.4-30.8-10.4-64.1 0-94.9V166h-87.5c-35.2 69.3-35.2 151.9 0 221.2l87.5-57.5z"/>
-        <path fill="#fff" d="M272 107.1c38.9 0 73.7 13.4 101.3 39.5l75.9-75.9C379.1 24.7 324.3 0 272 0 170.9 0 80 59.4 36.3 145.9l87.5 68.7c20.9-62.6 79.3-107.5 148.2-107.5z"/>
-    </svg>
-    Login with Google
-</a>
-
-    </div>
-</div>
-
-
+        <!-- Register Link -->
+        <div class="text-center">
+            <p class="mb-0 small text-muted">
+                Don't have an account? 
+                <a href="{{ route('register') }}" class="text-decoration-none fw-semibold">
+                    Create one here
+                </a>
+            </p>
+        </div>
     </form>
+
+    <!-- Password Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (togglePassword && passwordInput && toggleIcon) {
+                togglePassword.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    
+                    if (type === 'text') {
+                        toggleIcon.classList.remove('fa-eye');
+                        toggleIcon.classList.add('fa-eye-slash');
+                    } else {
+                        toggleIcon.classList.remove('fa-eye-slash');
+                        toggleIcon.classList.add('fa-eye');
+                    }
+                });
+            }
+        });
+    </script>
 </x-guest-layout>

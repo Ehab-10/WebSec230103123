@@ -2,28 +2,35 @@
 
 @section('content')
 <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow rounded-4">
-                <div class="card-header bg-primary text-white text-center fs-4">
-                    My Profile
-                </div>
-                <div class="card-body">
-                    <p class="mb-3"><strong>Name:</strong> {{ $user->name }}</p>
-                    <p class="mb-3"><strong>Email:</strong> {{ $user->email }}</p>
-                    <p class="mb-0"><strong>Joined:</strong> {{ $user->created_at->format('F d, Y') }}</p>
-                </div>
+    <h2>My Profile</h2>
 
-                @if(auth()->id() === $user->id)
-                <div class="card-footer text-end">
-                    <a href="{{ route('users.edit', $user->id) }}" class="btn btn-outline-primary">
-                        Edit Profile
-                    </a>
-                </div>
-                @endif
+    @if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-            </div>
+    <form method="POST" action="{{ route('profile.update') }}">
+        @csrf
+        <div class="mb-3">
+            <label>Name:</label>
+            <input type="text" name="name" value="{{ old('name', $user->name) }}" class="form-control" required>
+            @error('name') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
-    </div>
+        <div class="mb-3">
+            <label>Email:</label>
+            <input type="email" name="email" value="{{ old('email', $user->email) }}" class="form-control" required>
+            @error('email') <small class="text-danger">{{ $message }}</small> @enderror
+        </div>
+        <div class="mb-3">
+            <label>Password (leave blank to keep current):</label>
+            <input type="password" name="password" class="form-control">
+            @error('password') <small class="text-danger">{{ $message }}</small> @enderror
+        </div>
+        <div class="mb-3">
+            <label>Confirm Password:</label>
+            <input type="password" name="password_confirmation" class="form-control">
+        </div>
+
+        <button class="btn btn-primary">Update Profile</button>
+    </form>
 </div>
 @endsection

@@ -2,29 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
-use App\Models\Permission;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Routing\Controller;
-
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
- public function __construct()
-{
-    $this->middleware(function ($request, $next) {
-        if (!Auth::check() || !Auth::user()->admin) {
-            abort(403, 'غير مسموح.');
-        }
-        return $next($request);
-    });
-}
-
-
     public function index()
     {
-        $roles = Role::with('permissions')->get();
+        $roles = Role::paginate(10);
         return view('roles.index', compact('roles'));
     }
 
@@ -36,15 +22,20 @@ class RoleController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|unique:roles,name',
-            'permissions' => 'array|nullable'
+            'permissions' => 'array',
+            'permissions.*' => 'integer|exists:permissions,id',
         ]);
 
-        $role = Role::create(['name' => $request->name]);
-        $role->permissions()->sync($request->permissions);
+        $role = Role::create(['name' => $data['name']]);
 
-        return redirect()->route('roles.index')->with('success', 'تم إنشاء الدور بنجاح.');
+        if (!empty($data['permissions'])) {
+            $permissionNames = Permission::whereIn('id', $data['permissions'])->pluck('name')->toArray();
+            $role->syncPermissions($permissionNames);
+        }
+
+        return redirect()->route('roles.index')->with('success', 'Role created.');
     }
 
     public function edit(Role $role)
@@ -55,20 +46,28 @@ class RoleController extends Controller
 
     public function update(Request $request, Role $role)
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|unique:roles,name,' . $role->id,
-            'permissions' => 'array|nullable'
+            'permissions' => 'array',
+            'permissions.*' => 'integer|exists:permissions,id',
         ]);
 
-        $role->update(['name' => $request->name]);
-        $role->permissions()->sync($request->permissions);
+        $role->name = $data['name'];
+        $role->save();
 
-        return redirect()->route('roles.index')->with('success', 'تم تحديث الدور بنجاح.');
+        $permissionNames = [];
+        if (!empty($data['permissions'])) {
+            $permissionNames = Permission::whereIn('id', $data['permissions'])->pluck('name')->toArray();
+        }
+
+        $role->syncPermissions($permissionNames);
+
+        return redirect()->route('roles.index')->with('success', 'Role updated.');
     }
 
     public function destroy(Role $role)
     {
         $role->delete();
-        return redirect()->route('roles.index')->with('success', 'تم حذف الدور.');
+        return redirect()->route('roles.index')->with('success', 'Role deleted.');
     }
 }

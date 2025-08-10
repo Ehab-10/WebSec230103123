@@ -2,28 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Permission;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Routing\Controller;
-
+use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
-public function __construct()
-{
-    $this->middleware(function ($request, $next) {
-        if (!Auth::check() || !Auth::user()->admin) {
-            abort(403, 'غير مسموح.');
-        }
-        return $next($request);
-    });
-}
-
-
     public function index()
     {
-        $permissions = Permission::all();
+        $permissions = Permission::paginate(10);
         return view('permissions.index', compact('permissions'));
     }
 
@@ -34,12 +20,13 @@ public function __construct()
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|unique:permissions,name',
         ]);
 
-        Permission::create(['name' => $request->name]);
-        return redirect()->route('permissions.index')->with('success', 'تم إنشاء الصلاحية بنجاح.');
+        Permission::create(['name' => $data['name']]);
+
+        return redirect()->route('permissions.index')->with('success', 'Permission created.');
     }
 
     public function edit(Permission $permission)
@@ -49,18 +36,19 @@ public function __construct()
 
     public function update(Request $request, Permission $permission)
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|unique:permissions,name,' . $permission->id,
         ]);
 
-        $permission->update(['name' => $request->name]);
-        return redirect()->route('permissions.index')->with('success', 'تم تحديث الصلاحية.');
+        $permission->name = $data['name'];
+        $permission->save();
+
+        return redirect()->route('permissions.index')->with('success', 'Permission updated.');
     }
 
     public function destroy(Permission $permission)
     {
         $permission->delete();
-        return redirect()->route('permissions.index')->with('success', 'تم حذف الصلاحية.');
+        return redirect()->route('permissions.index')->with('success', 'Permission deleted.');
     }
 }
-

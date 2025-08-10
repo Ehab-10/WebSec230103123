@@ -1,81 +1,58 @@
 @extends('layouts.master')
 
 @section('content')
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">All Users</h2>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">Users</h3>
+                        @can('create_users')
+                        <a href="{{ route('users.create') }}" class="btn btn-primary mb-3">Add New User</a>
+                        @endcan
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 10px">ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th style="width: 120px">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($users as $user)
+                            <tr>
+                                <td>{{ $user->id }}</td>
+                                <td><a href="{{ route('users.show', $user) }}">{{ $user->name }}</a></td>
+                                <td>{{ $user->email }}</td>
+                                <td>{{ $user->getRoleNames()->first() ?? 'No Role' }}</td>
+                                <td>
+                                    @can('edit_users')
+                                    <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    @endcan
 
-        @if(auth()->user()->admin)
-            <a href="{{ route('users.create') }}" class="btn btn-success rounded-3">
-                + Add New User
-            </a>
-        @endif
-    </div>
-
-    {{-- Search --}}
-    <form method="GET" action="{{ route('users.index') }}" class="mb-4">
-        <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Search by name or email..." value="{{ request('search') }}">
-            <button class="btn btn-outline-primary">Search</button>
-        </div>
-    </form>
-
-    {{-- Users Table --}}
-    <div class="card shadow rounded-4">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-primary">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Admin</th>
-                        <th>Joined</th>
-                        @if(auth()->user()->admin)
-                            <th class="text-end">Actions</th>
-                        @endif
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($users as $user)
-                        <tr>
-                            <th>{{ $user->id }}</th>
-                            <td>{{ $user->name }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>
-                                @if($user->admin)
-                                    <span class="badge bg-success">Admin</span>
-                                @else
-                                    <span class="badge bg-secondary">User</span>
-                                @endif
-                            </td>
-                            <td>{{ $user->created_at->format('Y-m-d') }}</td>
-                            
-                            @if(auth()->user()->admin)
-                                <td class="text-end">
-                                    <a href="{{ route('profile.edit', $user->id) }}" class="btn btn-sm btn-info text-white">View</a>
-                                    <a href="{{ route('users.edit', $user->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                    <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                    @can('delete_users')
+                                    <form action="{{ route('users.destroy', $user) }}" method="POST" style="display:inline-block">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" onclick="return confirm('Are you sure?')" class="btn btn-sm btn-danger">Delete</button>
                                     </form>
+                                    @endcan
                                 </td>
-                            @endif
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="{{ auth()->user()->admin ? '6' : '5' }}" class="text-center py-4">No users found.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <div class="mt-3">
+                        {{ $users->links() }}
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-
-    {{-- Pagination --}}
-    <div class="mt-3">
-        {{ $users->withQueryString()->links() }}
     </div>
 </div>
 @endsection

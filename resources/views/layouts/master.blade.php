@@ -9,6 +9,7 @@
     body {
       background-color: #f0f2f5;
       font-family: 'Segoe UI', sans-serif;
+      padding-top: 70px; /* Prevent content from being hidden under fixed navbar */
     }
     .navbar-brand {
       font-weight: bold;
