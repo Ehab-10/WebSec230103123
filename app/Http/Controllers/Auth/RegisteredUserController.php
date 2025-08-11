@@ -44,7 +44,9 @@ class RegisteredUserController extends Controller
             'security_question' => $request->security_question,
             'security_answer' => Hash::make($request->security_answer),
             'credit' => 0, // رصيد ابتدائي
+            'customer_type' => 'customer', // النوع الافتراضي
         ]);
+        
         
         
     

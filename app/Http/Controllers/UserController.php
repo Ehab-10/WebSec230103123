@@ -25,41 +25,45 @@ class UserController extends Controller
 
     public function index()
     {
-
-        // dd(auth()->user()->getAllPermissions());
-
-    //     // فقط الأدمين يشوف كل المستخدمين
-        if (!auth()->user()->hasRole('admin|employee')) {
+        // Only admins and employees can access
+        if (!auth()->user()->hasAnyRole(['admin', 'employee'])) {
             abort(403, 'Unauthorized');
         }
-
-        $users = User::paginate(10);
+    
+        // Admin → all users
+        if (auth()->user()->hasRole('admin')) {
+            $users = User::paginate(10);
+        }
+        // Employee → only "user" role
+        elseif (auth()->user()->hasRole('employee')) {
+            $users = User::role('user')->paginate(10);
+        }
+    
         return view('users.index', compact('users'));
     }
-       public function create()
-    {
-        return view('users.create');
-    }
+    
 
-        public function store(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email'=> 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+            'role' => 'required|string|in:admin,employee,user'
         ]);
-
+    
         $user = User::create([
             'name' => $request->name,
             'email'=> $request->email,
             'password' => Hash::make($request->password),
+            'credit' => 0, // default credit
         ]);
-
-        // هنا ممكن تعطي الدور بناءً على إدخالك أو تعيين تلقائي
-        $user->assignRole('employee');
-
+    
+        $user->assignRole($request->role);
+    
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
+    
 
     public function show(User $user)
     {
@@ -210,5 +214,8 @@ public function updateProfile(Request $request)
     return redirect()->route('profile.show')->with('success', 'Profile updated successfully');
 
 }
+
+
+
 
 }

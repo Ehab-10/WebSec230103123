@@ -9,6 +9,7 @@
         <li class="list-group-item"><strong>Email:</strong> {{ $user->email }}</li>
         <li class="list-group-item"><strong>Role:</strong> {{ $user->roles->pluck('name')->join(', ') }}</li>
         <li class="list-group-item"><strong>Joined:</strong> {{ $user->created_at->format('Y-m-d') }}</li>
+        <li class="list-group-item"><strong>Credit:</strong> ${{ number_format($user->credit, 2) }}</li>
     </ul>
 
     <a href="{{ route('users.index') }}" class="btn btn-primary mt-3">Back to Users List</a>

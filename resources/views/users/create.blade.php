@@ -31,10 +31,20 @@
                             <input type="password" name="password" class="form-control" required>
                         </div>
 
-                        {{-- Admin Checkbox --}}
-                        <div class="form-check mb-3">
-                            <input type="checkbox" class="form-check-input" id="admin" name="admin" value="1">
-                            <label class="form-check-label" for="admin">Make this user an Admin</label>
+                        {{-- Confirm Password --}}
+                        <div class="mb-3">
+                            <label class="form-label">Confirm Password</label>
+                            <input type="password" name="password_confirmation" class="form-control" required>
+                        </div>
+
+                        {{-- Role Dropdown --}}
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <select name="role" class="form-select" required>
+                                <option value="user" selected>User</option>
+                                <option value="employee">Employee</option>
+                                <option value="admin">Admin</option>
+                            </select>
                         </div>
 
                         {{-- Submit --}}

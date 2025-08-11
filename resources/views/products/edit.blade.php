@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('products.update', $product->id) }}" method="POST" class="card p-4 shadow-sm">
+    <form action="{{ route('products.update', $product->id) }}" method="POST" class="card p-4 shadow-sm" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -35,16 +35,16 @@
         </div>
 
         <div class="mb-3">
-    <label class="form-label">Image URL:</label>
-    <input type="url" name="image_url" value="{{ old('image_url', $product->image_url) }}" class="form-control">
-</div>
-
-@if ($product->image_url)
-    <div class="mb-3 text-center">
-        <label class="form-label d-block">Current Image:</label>
-        <img src="{{ $product->image_url }}" alt="Product Image" class="img-fluid" style="max-height: 200px;">
+        <label class="form-label">Product Image:</label>
+        <input type="file" name="image" class="form-control" accept="image/*">
     </div>
-@endif
+
+    @if ($product->image_url)
+        <div class="mb-3 text-center">
+            <label class="form-label d-block">Current Image:</label>
+            <img src="{{ $product->image_url }}" alt="Product Image" class="img-fluid" style="max-height: 200px;">
+        </div>
+    @endif
 
 
         <div class="d-flex justify-content-between">

@@ -14,6 +14,9 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\FacebookController;
 use App\Http\Controllers\SocialController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\EmployeeController;
+
 
 // الصفحة الرئيسية
 Route::get('/', fn() => redirect('/dashboard'));
@@ -67,6 +70,9 @@ Route::middleware(['auth', 'permission:edit_users'])->group(function () {
     Route::resource('users', UserController::class);
 });
 
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
+
+
 
 
 // ----------------- صفحات عامة (بدون تسجيل دخول) -----------------
@@ -111,3 +117,27 @@ Route::get('/edit-post', fn () => 'Edit Page')->middleware('permission:edit post
 Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 
 
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/purchase/{product}', [PurchaseController::class, 'store'])->name('purchase.store');
+    Route::get('/my-purchases', [PurchaseController::class, 'myPurchases'])->name('purchases.my');
+});
+
+
+use App\Http\Controllers\CreditController;
+
+Route::middleware(['auth', 'role:employee|admin'])->group(function () {
+    Route::get('/credit/add', [CreditController::class, 'addCreditForm'])->name('credit.form');
+    Route::post('/credit/add', [CreditController::class, 'addCredit'])->name('credit.add');
+});
+
+
+Route::post('/products/{product}/buy', [ProductController::class, 'buy'])->name('products.buy')->middleware('auth');
+
+
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
+    Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
+});

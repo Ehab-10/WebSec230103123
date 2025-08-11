@@ -15,4 +15,10 @@ class Product extends Model
     'description',
 ];
 
+public function buyers()
+{
+    return $this->belongsToMany(User::class, 'purchases')->withTimestamps();
+}
+
+
 }

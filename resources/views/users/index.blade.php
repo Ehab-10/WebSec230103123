@@ -11,6 +11,14 @@
                         @can('create_users')
                         <a href="{{ route('users.create') }}" class="btn btn-primary mb-3">Add New User</a>
                         @endcan
+                        @if(auth()->user()->hasRole('admin'))
+                        <div class="d-flex justify-content-end mb-3">
+    <a href="{{ route('employees.create') }}" class="btn btn-success">
+        + Add Employee
+    </a>
+    @endif
+</div>
+
                     </div>
                 </div>
                 <div class="card-body">
@@ -21,7 +29,7 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Role</th>
-                                <th style="width: 120px">Actions</th>
+                                <th style="width: 220px">Actions</th> {{-- زدنا العرض شوي للزر الإضافي --}}
                             </tr>
                         </thead>
                         <tbody>
@@ -42,6 +50,10 @@
                                         <button type="submit" onclick="return confirm('Are you sure?')" class="btn btn-sm btn-danger">Delete</button>
                                     </form>
                                     @endcan
+
+                                    @hasanyrole('admin|employee')
+                                    <a href="{{ route('credit.form') }}?user_id={{ $user->id }}" class="btn btn-sm btn-success">Add Credit</a>
+                                    @endhasanyrole
                                 </td>
                             </tr>
                             @endforeach
